@@ -80,9 +80,9 @@ CPU类的定义为：
 ```
 public class CPU
 {
-	public static CPU cpu=new CPU();
-	public Timer ti;
-	public MMU mm;
+    public static CPU cpu=new CPU();
+    public Timer ti;
+    public MMU mm;
 }
 ```
 
@@ -101,8 +101,8 @@ CPU的结构及内容：
 ```
 public class Memory
 {
-	public static Memory memory=new Memory();
-	private byte []data=new byte[32*1024];		//32KB=32768B
+    public static Memory memory=new Memory();
+    private byte []data=new byte[32*1024];        //32KB=32768B
 }
 ```
 内存总大小为32KB，规定：前16KB为内核区，后16KB为用户区
@@ -120,8 +120,8 @@ public class Memory
 ```
 public class HardDisk
 {
-	public static HardDisk harddisk=new HardDisk();
-	private byte [][][]data=new byte[32][64][512];
+    public static HardDisk harddisk=new HardDisk();
+    private byte [][][]data=new byte[32][64][512];
 }
 ```
 硬盘总大小为1MB，规定：
@@ -148,8 +148,8 @@ public class HardDisk
 Page类设计如下：
 ```
 {
-    private int page_num;	//页号
-    private short[] data=new short[512/2];	//每页大小=512B=256个short类型
+    private int page_num;    //页号
+    private short[] data=new short[512/2];    //每页大小=512B=256个short类型
 }
 ```
 由于地址线和数据线均为16位，故每页中单位大小设置为16位，采用short类型进行描述。采用统一的页大小设计后，在进行页面调度时可以只关注调度算法，避免数据类型的影响。
@@ -157,41 +157,41 @@ Page类设计如下：
 #### 5.2 PCB设计
 PCB类中定义了如下变量，用以描述进程控制块的信息：
 ```
-private short pid;		//进程标识符
-private short state;	//进程状态。就绪态、等待态、运行态、挂起态
-private short priority;	//进程优先级
-private int job_intime;	//作业创建时间
-private int process_intime;	//进程创建时间
-private int end_time;	//作业/进程结束时间
-private short timeslice;	//时间片长度
-private int runtime;	//每次运行时，进程已经运行时间
-private int counter;	//该进程处于运行状态下的时间片余额
-private byte PSW;		//程序状态字。管态、目态
-private short current_instruction_no;	//当前运行到的指令编号
-private short instruction_num;	//该进程总共包含的指令数目
-private short pages_num;	//该作业/进程所占用的页面数目
+private short pid;        //进程标识符
+private short state;    //进程状态。就绪态、等待态、运行态、挂起态
+private short priority;    //进程优先级
+private int job_intime;    //作业创建时间
+private int process_intime;    //进程创建时间
+private int end_time;    //作业/进程结束时间
+private short timeslice;    //时间片长度
+private int runtime;    //每次运行时，进程已经运行时间
+private int counter;    //该进程处于运行状态下的时间片余额
+private byte PSW;        //程序状态字。管态、目态
+private short current_instruction_no;    //当前运行到的指令编号
+private short instruction_num;    //该进程总共包含的指令数目
+private short pages_num;    //该作业/进程所占用的页面数目
 public short [][]page_table = new short
 [(kernel.MEMORY_USER_SPACE_SIZE)/kernel.SINGLE_PAGE_SIZE][2];
 //页表，page_table[i][0]为进程的页号，从0开始编号；page_table[i][1]为对应的物理页号
-private ArrayList<Integer> instructions=new ArrayList<Integer>();	//该进程所有的指令
+private ArrayList<Integer> instructions=new ArrayList<Integer>();    //该进程所有的指令
 
-private short in_page_num=0;		//该PCB所在的页号
-private short pool_location=-1;		//该PCB在PCB池的位置
-private int total_runtime=0;		//总共运行的时间
-public int ins_runtime=0;			//指令的执行总时间
-public boolean if_in_p=false;		//是否处于P状态
-public boolean if_p_success=true;	//P是否成功
+private short in_page_num=0;        //该PCB所在的页号
+private short pool_location=-1;        //该PCB在PCB池的位置
+private int total_runtime=0;        //总共运行的时间
+public int ins_runtime=0;            //指令的执行总时间
+public boolean if_in_p=false;        //是否处于P状态
+public boolean if_p_success=true;    //P是否成功
 ```
 分别设置了用来读取和修改数据成员的接口。
 #### 5.3 JCB设计
 ```
-private short job_id;	//作业ID
-private short priority;	//作业/进程的优先级
-private int job_intime;	//作业进入时间
-private short instruction_num;	//作业包含的指令数目
-private short pages_num;	//作业所占用的页面数目
-private ArrayList<Short> all_instructions=new ArrayList<Short>();	//所有指令的链表
-private short in_page_num=0;		//该JCB所在的页号
+private short job_id;    //作业ID
+private short priority;    //作业/进程的优先级
+private int job_intime;    //作业进入时间
+private short instruction_num;    //作业包含的指令数目
+private short pages_num;    //作业所占用的页面数目
+private ArrayList<Short> all_instructions=new ArrayList<Short>();    //所有指令的链表
+private short in_page_num=0;        //该JCB所在的页号
 ```
 分别设置了用来读取和修改数据成员的接口。
 
@@ -199,65 +199,65 @@ private short in_page_num=0;		//该JCB所在的页号
 kernel类中定义了系统环境中的一些常量的值，以及一些变量不同值所对应的状态描述
 ```
 /*系统基本信息*/
-	public static int SINGLE_PAGE_SIZE=512;	//每一页/块的大小
-	public static int MEMORY_SIZE=32*1024;	//内存大小，32KB
-	public static int MEMORY_KERNEL_SPACE_SIZE=16*1024;	//内存内核空间大小，16KB
-	public static int MEMORY_KERNEL_CORESTACKANDOSKERNEL_SIZE=512;	//核心栈+系统内核大小，1页
-	public static int MEMORY_KERNEL_PCB_POOL_SIZE=31*512;	//PCB池大小，31页
-	public static int MEMORY_USER_SPACE_SIZE=16*1024;	//内存用户空间大小（页表、页框使用），16KB
-	public static int HARDDISK_SIZE=1*1024*1024;	//硬盘空间大小，1MB
-	public static int HARDDISK_VIRTUAL_MEMORY_SIZE=64*1024;	//虚存区大小，128页，64KB
-	public static int HARDDISK_SYSTEMFILE_SIZE=16*1024;	//系统文件大小，32页，16KB
-	public static int HARDDISK_FILE_SPACE_SIZE=944*1024;	//文件区大小，1888页，944KB
-	public static int HARDDISK_CYLINDER_NUM=32;	//磁盘磁道数
-	public static int HARDDISK_SECTOR_NUM=64;	//磁盘扇区数
-	public static int HARDDISK_PAGE_SIZE=512;	//磁盘每页/块大小
-	public static int SINGLE_INSTRUCTION_SIZE=8;	//单条指令的大小
-	public static int INSTRUCTIONS_PER_PAGE=SINGLE_PAGE_SIZE/SINGLE_INSTRUCTION_SIZE;
+    public static int SINGLE_PAGE_SIZE=512;    //每一页/块的大小
+    public static int MEMORY_SIZE=32*1024;    //内存大小，32KB
+    public static int MEMORY_KERNEL_SPACE_SIZE=16*1024;    //内存内核空间大小，16KB
+    public static int MEMORY_KERNEL_CORESTACKANDOSKERNEL_SIZE=512;    //核心栈+系统内核大小，1页
+    public static int MEMORY_KERNEL_PCB_POOL_SIZE=31*512;    //PCB池大小，31页
+    public static int MEMORY_USER_SPACE_SIZE=16*1024;    //内存用户空间大小（页表、页框使用），16KB
+    public static int HARDDISK_SIZE=1*1024*1024;    //硬盘空间大小，1MB
+    public static int HARDDISK_VIRTUAL_MEMORY_SIZE=64*1024;    //虚存区大小，128页，64KB
+    public static int HARDDISK_SYSTEMFILE_SIZE=16*1024;    //系统文件大小，32页，16KB
+    public static int HARDDISK_FILE_SPACE_SIZE=944*1024;    //文件区大小，1888页，944KB
+    public static int HARDDISK_CYLINDER_NUM=32;    //磁盘磁道数
+    public static int HARDDISK_SECTOR_NUM=64;    //磁盘扇区数
+    public static int HARDDISK_PAGE_SIZE=512;    //磁盘每页/块大小
+    public static int SINGLE_INSTRUCTION_SIZE=8;    //单条指令的大小
+    public static int INSTRUCTIONS_PER_PAGE=SINGLE_PAGE_SIZE/SINGLE_INSTRUCTION_SIZE;
     //每一页的指令数目
-	
-	public static int INTERRUPTION_INTERVAL=10;		//系统发生中断的间隔
-	public static int SYSTEM_TIME=0;		//系统内时间
-	public static void SystemTimeAdd() {kernel.SYSTEM_TIME+=kernel.INTERRUPTION_INTERVAL;}	//系统时间自增
-	public static int TLB_LENGTH=kernel.MEMORY_USER_SPACE_SIZE/kernel.SINGLE_PAGE_SIZE/2;	//TLB快表的长度，16
-	/*系统基本信息*/
-	
-	/*Process State 进程状态参数*/
-	public final static short PROCESS_READY = 0;	//就绪态
-	public final static short PROCESS_WAITING = 1;	//等待态
-	public final static short PROCESS_RUNNING = 2;	//运行态
-	public final static short PROCESS_SUSPENSION = 3;	//挂起态
-	/*Process State 进程状态参数*/
-	
-	/*Process PSW 程序状态字*/
-	public final static byte PSW_KERNEL_STATE=0;	//管态
-	public final static byte PSW_USER_STATE=1; 		//目态
-	/*Process PSW 程序状态字*/
-	
-	/*硬件初始化需要变量*/
-	public static String MEMORYFILE_PATHNAME="./input/memory.dat";		//内存文件地址
-	public static String HARDDISKFILE_PATHNAME="./input/harddisk.dat";	//硬盘文件地址
-	public static String CPUFILE_PATHNAME="./input/cpu.dat";			//CPU文件地址
-	/*硬件初始化需要变量*/
-	
-	/*60条指令*/
-	public static int GetInstructionType(int instruction){
-		//获取指令类型
-		if(instruction>=0&&instruction<=9)return 1;
-		if(instruction>=10&&instruction<=19)return 2;
-		if(instruction>=20&&instruction<=29)return 3;
-		if(instruction>=30&&instruction<=39)return 4;
-		if(instruction>=40&&instruction<=49)return 5;
-		if(instruction>=50&&instruction<=59)return 6;
-		return -1;
+    
+    public static int INTERRUPTION_INTERVAL=10;        //系统发生中断的间隔
+    public static int SYSTEM_TIME=0;        //系统内时间
+    public static void SystemTimeAdd() {kernel.SYSTEM_TIME+=kernel.INTERRUPTION_INTERVAL;}    //系统时间自增
+    public static int TLB_LENGTH=kernel.MEMORY_USER_SPACE_SIZE/kernel.SINGLE_PAGE_SIZE/2;    //TLB快表的长度，16
+    /*系统基本信息*/
+    
+    /*Process State 进程状态参数*/
+    public final static short PROCESS_READY = 0;    //就绪态
+    public final static short PROCESS_WAITING = 1;    //等待态
+    public final static short PROCESS_RUNNING = 2;    //运行态
+    public final static short PROCESS_SUSPENSION = 3;    //挂起态
+    /*Process State 进程状态参数*/
+    
+    /*Process PSW 程序状态字*/
+    public final static byte PSW_KERNEL_STATE=0;    //管态
+    public final static byte PSW_USER_STATE=1;         //目态
+    /*Process PSW 程序状态字*/
+    
+    /*硬件初始化需要变量*/
+    public static String MEMORYFILE_PATHNAME="./input/memory.dat";        //内存文件地址
+    public static String HARDDISKFILE_PATHNAME="./input/harddisk.dat";    //硬盘文件地址
+    public static String CPUFILE_PATHNAME="./input/cpu.dat";            //CPU文件地址
+    /*硬件初始化需要变量*/
+    
+    /*60条指令*/
+    public static int GetInstructionType(int instruction){
+        //获取指令类型
+        if(instruction>=0&&instruction<=9)return 1;
+        if(instruction>=10&&instruction<=19)return 2;
+        if(instruction>=20&&instruction<=29)return 3;
+        if(instruction>=30&&instruction<=39)return 4;
+        if(instruction>=40&&instruction<=49)return 5;
+        if(instruction>=50&&instruction<=59)return 6;
+        return -1;
     }
-	public static int GetInstructionTime(int instruction)
-	{/*获取指令执行所需要时间*/return ((int)(instruction%10))*10+20;}
-	public static int[] MUTEX= {-4,-3,-2,-1,0,1,2,3,4,5};		//临界区信号量,10个
-	public static int[] SYSTEM_RESOURCE= {0,1,2,3,4,5,6,7,8,9};	//系统资源量，10个
-	public static int GetUseResourceNum(int instruction)
-	{/*获取该指令所申请、释放的PV、资源所在的数组序号*/return instruction%10;}
-	/*60条指令*/
+    public static int GetInstructionTime(int instruction)
+    {/*获取指令执行所需要时间*/return ((int)(instruction%10))*10+20;}
+    public static int[] MUTEX= {-4,-3,-2,-1,0,1,2,3,4,5};        //临界区信号量,10个
+    public static int[] SYSTEM_RESOURCE= {0,1,2,3,4,5,6,7,8,9};    //系统资源量，10个
+    public static int GetUseResourceNum(int instruction)
+    {/*获取该指令所申请、释放的PV、资源所在的数组序号*/return instruction%10;}
+    /*60条指令*/
 ```
 
 ### 6 模块设计说明
@@ -269,34 +269,34 @@ kernel类中定义了系统环境中的一些常量的值，以及一些变量�
 与作业管理有关的操作有： 
 ```
 public short GetJobNum(){
-	//获得当前磁盘中的作业总数量
-	
-	public int GetCurrentCreateJobID()
-	//获取当前要创建的作业的编号
-	
-	public void SaveJobToHardDisk(JCB jcb)
-	//将作业保存到外存，d1是JCB数据块，d2是包含所有指令的ArrayList，每条指令占8字节
-	
-	public void GetJCBFromFile(File f)
-	//从文件中读取所有的JCB
-	
-	public ArrayList<JCB> GetAllJCB()
-	//获取所有的JCB
-	
-	public void NextJob()
-	//已经读取完一个作业，进入到下一个作业
-	
-	public int GetNextJobNum()
-	//获取下一个将要被创建的JCB的序号
-	
-	public boolean IsAllJobToProcess()
-	//检测是否还有作业没有变成进程
-	
-	public void RefreshJobList()
-	//刷新作业后备队列
-	
-	public boolean IsJobListEmpty()
-	//查看作业后备队列是否为空
+    //获得当前磁盘中的作业总数量
+    
+    public int GetCurrentCreateJobID()
+    //获取当前要创建的作业的编号
+    
+    public void SaveJobToHardDisk(JCB jcb)
+    //将作业保存到外存，d1是JCB数据块，d2是包含所有指令的ArrayList，每条指令占8字节
+    
+    public void GetJCBFromFile(File f)
+    //从文件中读取所有的JCB
+    
+    public ArrayList<JCB> GetAllJCB()
+    //获取所有的JCB
+    
+    public void NextJob()
+    //已经读取完一个作业，进入到下一个作业
+    
+    public int GetNextJobNum()
+    //获取下一个将要被创建的JCB的序号
+    
+    public boolean IsAllJobToProcess()
+    //检测是否还有作业没有变成进程
+    
+    public void RefreshJobList()
+    //刷新作业后备队列
+    
+    public boolean IsJobListEmpty()
+    //查看作业后备队列是否为空
 }
 ```
 #### 6.2 进程管理
@@ -309,117 +309,117 @@ public short GetJobNum(){
 与进程管理有关的操作有： 
 ```
 ProcessModule(){//构造函数
-	
-	public PCB TurnJCBToPCB(JCB jcb)
-	//将JCB变换为PCB
-	
-	public void TransferJobCodeToSwapArea(JCB jcb,String apply)
-	//将指定作业的程序段存入虚存中
-	//jcb为作业控制块，apply为申请到的虚存空间分配字符串
-	
-	public void WriteProcessPageTable(PCB pcb,String apply)
-	//将申请到的虚存页面写入到进程的页表中
-	
-	public short GetFreePCBNumInPool()
-	//获取PCB池中可用的PCB数量
-	
-	public void DeletePCBInPool(PCB pcb)
-	//将某一个PCB从PCB池中删除
-	
-	public short ApplyOnePCBInPool()
-	//在PCB池中申请一个PCB
-	
-	public void AddToPCBPool(PCB pcb)
-	//将PCB加入到PCB池中
-	
-	public void TransferProcessToRunningQueue(PCB pcb)
-	//将进程移入运行队列
-	//遍历就绪队列、等待队列、挂起队列，将进程移出，只加入到运行队列
-	//移入运行队列
-	
-	public void TransferProcessToReadyQueue(PCB pcb,boolean if_active)
-	//将进程移入就绪队列
-	//遍历运行队列、等待队列、挂起队列，将进程移出，只加入到就绪队列
-	//移入就绪队列
-	
-	public void TransferProcessToWaitQueue(PCB pcb)
-	//将进程移入等待队列
-	//遍历运行队列、就绪队列、挂起队列，将进程移出，只加入到等待队列
-	//移入等待队列
-	
-	public void TransferProcessToSuspendQueue(PCB pcb)
-	//将进程移入挂起队列
-	//遍历运行队列、就绪队列、等待队列，将进程移出，只加入到挂起队列
-	//移入挂起队列
-	
-	public void TransferProcessToEndQueue(PCB pcb)
-	//将进程移入完成队列
-	//遍历运行队列、就绪队列、等待队列、挂起队列，将进程移出，加入到完成队列
-	//移入完成队列
-	
-	public void RefreshReadyQueueBitmap()
-	//刷新就绪队列的bitmap
+    
+    public PCB TurnJCBToPCB(JCB jcb)
+    //将JCB变换为PCB
+    
+    public void TransferJobCodeToSwapArea(JCB jcb,String apply)
+    //将指定作业的程序段存入虚存中
+    //jcb为作业控制块，apply为申请到的虚存空间分配字符串
+    
+    public void WriteProcessPageTable(PCB pcb,String apply)
+    //将申请到的虚存页面写入到进程的页表中
+    
+    public short GetFreePCBNumInPool()
+    //获取PCB池中可用的PCB数量
+    
+    public void DeletePCBInPool(PCB pcb)
+    //将某一个PCB从PCB池中删除
+    
+    public short ApplyOnePCBInPool()
+    //在PCB池中申请一个PCB
+    
+    public void AddToPCBPool(PCB pcb)
+    //将PCB加入到PCB池中
+    
+    public void TransferProcessToRunningQueue(PCB pcb)
+    //将进程移入运行队列
+    //遍历就绪队列、等待队列、挂起队列，将进程移出，只加入到运行队列
+    //移入运行队列
+    
+    public void TransferProcessToReadyQueue(PCB pcb,boolean if_active)
+    //将进程移入就绪队列
+    //遍历运行队列、等待队列、挂起队列，将进程移出，只加入到就绪队列
+    //移入就绪队列
+    
+    public void TransferProcessToWaitQueue(PCB pcb)
+    //将进程移入等待队列
+    //遍历运行队列、就绪队列、挂起队列，将进程移出，只加入到等待队列
+    //移入等待队列
+    
+    public void TransferProcessToSuspendQueue(PCB pcb)
+    //将进程移入挂起队列
+    //遍历运行队列、就绪队列、等待队列，将进程移出，只加入到挂起队列
+    //移入挂起队列
+    
+    public void TransferProcessToEndQueue(PCB pcb)
+    //将进程移入完成队列
+    //遍历运行队列、就绪队列、等待队列、挂起队列，将进程移出，加入到完成队列
+    //移入完成队列
+    
+    public void RefreshReadyQueueBitmap()
+    //刷新就绪队列的bitmap
 
-	public void RefreshActiveExpired()
-	//刷新active和expired指针
-	
-	public boolean IfPageInMemory(short page_num)
-	//检测需要的页是否在内存中
-	//检测是否发生缺页中断
-	
-	public void ChangePageTable(short ori_page_num,short changed_page_num)
-	//将持有原来页的进程的页表更新
-	
-	public void SolveMissingPage(PCB pcb,short need_page_num)
-	//缺页中断的处理，need_page_num为需要的在外存中的页的页号
-	
-	public boolean IfRunOver(PCB pcb)
-	//检测某进程是否运行完毕
-	
-	public boolean IfTimeSliceOver(PCB pcb)
-	//检测时间片是否用完
-	
-	public void AddToEndQueue(PCB pcb)
-	//将作业加入到结束队列
-	
-	public boolean IsRunningQueueEmpty()
-	//检测运行队列是否为空
-	
-	public boolean IsReadyQueueEmpty()
-	//检测就绪队列是否为空
-	
-	public boolean IsWaitQueueEmpty()
-	//检测等待队列是否为空
-	
-	public boolean IsSuspendQueueEmpty()
-	//检测挂起队列是否为空
+    public void RefreshActiveExpired()
+    //刷新active和expired指针
+    
+    public boolean IfPageInMemory(short page_num)
+    //检测需要的页是否在内存中
+    //检测是否发生缺页中断
+    
+    public void ChangePageTable(short ori_page_num,short changed_page_num)
+    //将持有原来页的进程的页表更新
+    
+    public void SolveMissingPage(PCB pcb,short need_page_num)
+    //缺页中断的处理，need_page_num为需要的在外存中的页的页号
+    
+    public boolean IfRunOver(PCB pcb)
+    //检测某进程是否运行完毕
+    
+    public boolean IfTimeSliceOver(PCB pcb)
+    //检测时间片是否用完
+    
+    public void AddToEndQueue(PCB pcb)
+    //将作业加入到结束队列
+    
+    public boolean IsRunningQueueEmpty()
+    //检测运行队列是否为空
+    
+    public boolean IsReadyQueueEmpty()
+    //检测就绪队列是否为空
+    
+    public boolean IsWaitQueueEmpty()
+    //检测等待队列是否为空
+    
+    public boolean IsSuspendQueueEmpty()
+    //检测挂起队列是否为空
 
-	public int GetActivePoint()
-	//获取active指针
-	
-	public int GetExpiredPoint()
-	//获取expired指针
-	
-	public PCB GetPCBWithID(short id)
-	//根据进程ID获取PCB
-	
-	public void RunType1(PCB pcb)
-	//类型1指令的处理
-	
-	public void RunType2(PCB pcb)
-	//类型2指令的处理
-	
-	public void RunType3(PCB pcb)
-	//指令类型3的处理
+    public int GetActivePoint()
+    //获取active指针
+    
+    public int GetExpiredPoint()
+    //获取expired指针
+    
+    public PCB GetPCBWithID(short id)
+    //根据进程ID获取PCB
+    
+    public void RunType1(PCB pcb)
+    //类型1指令的处理
+    
+    public void RunType2(PCB pcb)
+    //类型2指令的处理
+    
+    public void RunType3(PCB pcb)
+    //指令类型3的处理
 
-	public void RunType4(PCB pcb)
-	//指令类型4的处理
-	
-	public void RunType5(PCB pcb)
-	//指令类型5的处理
-	
-	public void RunType6(PCB pcb)
-	//类型6指令的处理
+    public void RunType4(PCB pcb)
+    //指令类型4的处理
+    
+    public void RunType5(PCB pcb)
+    //指令类型5的处理
+    
+    public void RunType6(PCB pcb)
+    //类型6指令的处理
 }
 ```
 #### 6.3 页面管理
@@ -429,96 +429,96 @@ ProcessModule(){//构造函数
 
 与页面管理相关的操作有： 
 ```
-	PageModule()//构造函数
-	{
-		InitSwapAreaUsage();	//初始化交换区页面被占用状态
-		for(int i=0;i<6;i++)	//实例化伙伴算法的空闲链表
-			this.free_area[i]=new ArrayList<Short>();
-		InitFreeAreaList();		//初始化空闲链表
-		RefreshBitmap();		//刷新伙伴算法的Bitmap
-	}
-	
-	private void InitSwapAreaUsage()
-	//初始化交换区页的使用情况
-	
-	private void InitFreeAreaList()
-	//初始化空闲链表
-	
-	public void RefreshBitmap()
-	//刷新bitmap
-	
-	private int SetOneBit(int num,int loca,int bit)
-	//修改bitmap中的某一位信息
-	
-	private int GetOneBit(int num,int loca)
-	//获得bitmap中的某一位信息
-	
-	public int GetFreePageNumInMemory()
-	//返回当前物理内存中可用的页框数
-	
-	public int GetFreePageNumInDisk()
-	//返回当前虚存中可用的页框数
-	public Page GetPage(short num)
-	//获得某一个页面
-	
-	public boolean IfCouldApplyPageInDisk(short num)
-	//检测在虚存中是否可以申请num个页面
-	
-	public int CalculateCloest2Num(short num)
-	//计算出与该数字最接近的2的次幂数的幂
-	
-	private void SetBlockState(int list,int no,int set_num,int state)
-	//在伙伴算法的链表中，在第list级别的第no块设置连续的set_num块为state状态
-	
-	private void RefreshBlockList()
-	//从底往上刷新块链表
-	
-	public String ApplyPageInMemory(short num)
-	//在内存中，向伙伴算法申请num个页面
-	
-	public String ApplyPageInDisk(short page_num)
-	//在虚存中申请page_num个页面，返回一个String类型的值
-	//String格式的数据说明：从左到右编号为0-191，共192位，每一位的值为0/1，1代表该页面分配给该进程使用。在写入程序区时，必须按照分配的页面顺序从小到大写入
-	//同时，在记录数组中记录这些申请的页框，将他们设置为已用状态
-	
-	public void FreePageInMemory(short page_num)
-	//在内存中，利用伙伴算法释放某一页
-	
-	public void FreePageInDisk(short page_num)
-	//在外存中，释放某一页
-	
-	public void RecyclePage(short page_num)
-	//回收页面，参数num为页面号（num从0开始编号）
-	//将该页的内容全部清空，并在记录中使得该页表示为未被占用
-	
-	public void MoveToMemory(short memory_page_num,short swap_page_num)
-	//将指定的虚存页移动到指定的内存页中
-	
-	public void MoveToDisk(short memory_page_num,short swap_page_num)
-	//将指定的内存页移动到指定的虚存页中
-	
-	public void ExchangePage(short memory_page_num,short swap_page_num)
-	//交换两个页面的内容
-	public void CopyPage(short src_page_num,short des_page_num)
-	//将序号src_page_num的页面复制到序号为des_page_num的页面中
-	
-	public short GetOneFreePageInMemory()
-	//在物理内存中找到一个空闲的页面，并返回该页面序号
-	
-	public short GetOneFreePageInDisk()
-	//在虚存中找到一个空闲的页面，并返回该页面序号
-	
-	public void LRUVisitOnePage(int page_num)
-	//LRU访问某一页
-	
-	public short LRUGetLastPageNum()
-	//获得应该调出的页面号
-	
-	public boolean isBlockUsing(int i,int j)
-	//获取内存中某一个页的使用情况
-	
-	public boolean isPageUsing(int i)
-	//获取虚存中某一页的使用情况
+    PageModule()//构造函数
+    {
+        InitSwapAreaUsage();    //初始化交换区页面被占用状态
+        for(int i=0;i<6;i++)    //实例化伙伴算法的空闲链表
+            this.free_area[i]=new ArrayList<Short>();
+        InitFreeAreaList();        //初始化空闲链表
+        RefreshBitmap();        //刷新伙伴算法的Bitmap
+    }
+    
+    private void InitSwapAreaUsage()
+    //初始化交换区页的使用情况
+    
+    private void InitFreeAreaList()
+    //初始化空闲链表
+    
+    public void RefreshBitmap()
+    //刷新bitmap
+    
+    private int SetOneBit(int num,int loca,int bit)
+    //修改bitmap中的某一位信息
+    
+    private int GetOneBit(int num,int loca)
+    //获得bitmap中的某一位信息
+    
+    public int GetFreePageNumInMemory()
+    //返回当前物理内存中可用的页框数
+    
+    public int GetFreePageNumInDisk()
+    //返回当前虚存中可用的页框数
+    public Page GetPage(short num)
+    //获得某一个页面
+    
+    public boolean IfCouldApplyPageInDisk(short num)
+    //检测在虚存中是否可以申请num个页面
+    
+    public int CalculateCloest2Num(short num)
+    //计算出与该数字最接近的2的次幂数的幂
+    
+    private void SetBlockState(int list,int no,int set_num,int state)
+    //在伙伴算法的链表中，在第list级别的第no块设置连续的set_num块为state状态
+    
+    private void RefreshBlockList()
+    //从底往上刷新块链表
+    
+    public String ApplyPageInMemory(short num)
+    //在内存中，向伙伴算法申请num个页面
+    
+    public String ApplyPageInDisk(short page_num)
+    //在虚存中申请page_num个页面，返回一个String类型的值
+    //String格式的数据说明：从左到右编号为0-191，共192位，每一位的值为0/1，1代表该页面分配给该进程使用。在写入程序区时，必须按照分配的页面顺序从小到大写入
+    //同时，在记录数组中记录这些申请的页框，将他们设置为已用状态
+    
+    public void FreePageInMemory(short page_num)
+    //在内存中，利用伙伴算法释放某一页
+    
+    public void FreePageInDisk(short page_num)
+    //在外存中，释放某一页
+    
+    public void RecyclePage(short page_num)
+    //回收页面，参数num为页面号（num从0开始编号）
+    //将该页的内容全部清空，并在记录中使得该页表示为未被占用
+    
+    public void MoveToMemory(short memory_page_num,short swap_page_num)
+    //将指定的虚存页移动到指定的内存页中
+    
+    public void MoveToDisk(short memory_page_num,short swap_page_num)
+    //将指定的内存页移动到指定的虚存页中
+    
+    public void ExchangePage(short memory_page_num,short swap_page_num)
+    //交换两个页面的内容
+    public void CopyPage(short src_page_num,short des_page_num)
+    //将序号src_page_num的页面复制到序号为des_page_num的页面中
+    
+    public short GetOneFreePageInMemory()
+    //在物理内存中找到一个空闲的页面，并返回该页面序号
+    
+    public short GetOneFreePageInDisk()
+    //在虚存中找到一个空闲的页面，并返回该页面序号
+    
+    public void LRUVisitOnePage(int page_num)
+    //LRU访问某一页
+    
+    public short LRUGetLastPageNum()
+    //获得应该调出的页面号
+    
+    public boolean isBlockUsing(int i,int j)
+    //获取内存中某一个页的使用情况
+    
+    public boolean isPageUsing(int i)
+    //获取虚存中某一页的使用情况
 }
 ```
 #### 6.4 调度算法
@@ -526,21 +526,21 @@ ProcessModule(){//构造函数
 ```
 public void run(){
 //线程执行函数，负责进行调度
-	
-	public void UIRefresh()
-	//不同UI的刷新
-	
-	public void SuspendProcessWithPageNum(short num)
-	//检测某一页所关联的进程，并将该进程加入到挂起态
-	
-	public void HighLevelScheduling()
-	//高级调度
-	
-	public void MiddleLevelScheduling()
-	//中级调度
-	
-	public void LowLevelScheduling()
-	//低级调度
+    
+    public void UIRefresh()
+    //不同UI的刷新
+    
+    public void SuspendProcessWithPageNum(short num)
+    //检测某一页所关联的进程，并将该进程加入到挂起态
+    
+    public void HighLevelScheduling()
+    //高级调度
+    
+    public void MiddleLevelScheduling()
+    //中级调度
+    
+    public void LowLevelScheduling()
+    //低级调度
 }
 ```
 #### 6.5 界面模块
